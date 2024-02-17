@@ -1,12 +1,44 @@
 version: '3.9'
 services:
-  backend-app:
+  geopraxis:
     build:
       context: .
-      dockerfile: local.Dockerfile
-    command: '/app/scripts/docker/local-run.sh'
+      dockerfile: Dockerfile
     ports:
       - '8080:8080'
     env_file: .env
+    environment:
+      - NODE_ENV=${NODE_ENV}
+      - PORT=${PORT}
+      - CORS_ORIGIN=${CORS_ORIGIN}
+      - PUBLIC_PATH=${PUBLIC_PATH}
+      - DB_LOCAL_URL=${DB_LOCAL_URL}
+      - DB_REMOTE_URL=${DB_REMOTE_URL}
+      - MONGO_INITDB_ROOT_USERNAME=${MONGO_INITDB_ROOT_USERNAME}
+      - MONGO_INITDB_ROOT_PASSWORD=${MONGO_INITDB_ROOT_PASSWORD}
+      - MONGO_INITDB_DATABASE=${MONGO_INITDB_DATABASE}
+    networks:
+      - node-network
     volumes:
       - './src:/app/src'
+  mongo:
+    image: mongo:latest
+    ports:
+      - '27017:27017'
+    volumes:
+      - dbdata:/data/db
+    networks:
+      - node-network
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=${MONGO_INITDB_ROOT_USERNAME}
+      - MONGO_INITDB_ROOT_PASSWORD=${MONGO_INITDB_ROOT_PASSWORD}
+      - MONGO_INITDB_DATABASE=${MONGO_INITDB_DATABASE}
+    profiles:
+      - dev
+
+volumes:
+  dbdata:
+
+networks:
+  node-network:
+    driver: bridge

@@ -1,9 +1,11 @@
+import { openDbConnection } from '@common/utils/db';
 import { getPort } from '@common/utils/envConfig';
 import { app, logger } from '@src/server';
 
 const port = getPort();
 
 const server = app.listen(port, () => {
+  openDbConnection();
   logger.info(`Server listening on port ${port}`);
 });
 
